@@ -44,8 +44,9 @@ h2,h3 {color:#14243A}
 """, unsafe_allow_html=True)
 @st.cache_resource
 def load_model():
-     return tf.keras.models.load_model(MODEL_PATH)
-  def prepare_image(pil_image):
+     return
+    tf.keras.models.load_model(MODEL_PATH)
+def prepare_image(pil_image):
       image = pil_image.convert("RGB").resize(IMAGE_SIZE)
       arr = np.asarray(image, dtype=np.float32)
       if PIXEL_SCALE == "0_1":
