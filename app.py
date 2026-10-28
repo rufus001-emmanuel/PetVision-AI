@@ -121,9 +121,9 @@ elif page == "Predict image":
         except Exception as error:
                 st.error(f"Could not process this image: {error}")
                 st.warning("Check model file, class order, image size, and preprocessing.")
-  else:
+    else:
       st.info("Choose an image to see its preview and prediction.")
-    elif page == "Batch analysis":
+ elif page == "Batch analysis":
         st.markdown("### Batch image analysis")
         files = st.file_uploader(
            "Select multiple images (20+ supported)",
