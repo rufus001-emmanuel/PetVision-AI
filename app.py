@@ -51,7 +51,7 @@ def prepare_image(pil_image):
       if PIXEL_SCALE == "0_1":
            arr = arr / 255.0
        # If your notebook uses special preprocessing, reproduce it here.
-     return np.expand_dims(arr, axis=0)
+      return np.expand_dims(arr, axis=0)
 def predict_image(pil_image, model):
     output = model.predict(prepare_image(pil_image), verbose=0)
     scores = np.asarray(output)[0].astype(float).ravel()
