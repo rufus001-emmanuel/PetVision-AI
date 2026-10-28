@@ -123,7 +123,7 @@ elif page == "Predict image":
                 st.warning("Check model file, class order, image size, and preprocessing.")
     else:
       st.info("Choose an image to see its preview and prediction.")
- elif page == "Batch analysis":
+elif page == "Batch analysis":
         st.markdown("### Batch image analysis")
         files = st.file_uploader(
            "Select multiple images (20+ supported)",
