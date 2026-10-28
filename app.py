@@ -1,10 +1,11 @@
 import json
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
-import streamlit as st
-import tensorflow as tf
 from PIL import Image
+import streamlit as st
+import tensorflow as tf  # pyright: ignore[reportMissingModuleSource]
 # IMPORTANT: change these to match your existing notebook.
 MODEL_PATH = "model.keras"
 LABELS = ["dog", "cat", "neither"]  # Use your exact class-index order.
@@ -46,12 +47,12 @@ h2,h3 {color:#14243A}
 def load_model():
      return tf.keras.models.load_model(MODEL_PATH)
 def prepare_image(pil_image):
-      image = pil_image.convert("RGB").resize(IMAGE_SIZE)
-      arr = np.asarray(image, dtype=np.float32)
-      if PIXEL_SCALE == "0_1":
-           arr = arr / 255.0
-       # If your notebook uses special preprocessing, reproduce it here.
-      return np.expand_dims(arr, axis=0)
+    image = pil_image.convert("RGB").resize(IMAGE_SIZE)
+    arr = np.asarray(image, dtype=np.float32)
+    if PIXEL_SCALE == "0_1":
+        arr = arr / 255.0
+    # If your notebook uses special preprocessing, reproduce it here.
+    return np.expand_dims(arr, axis=0)
 def predict_image(pil_image, model):
     output = model.predict(prepare_image(pil_image), verbose=0)
     scores = np.asarray(output)[0].astype(float).ravel()
@@ -124,58 +125,58 @@ elif page == "Predict image":
     else:
       st.info("Choose an image to see its preview and prediction.")
 elif page == "Batch analysis":
-        st.markdown("### Batch image analysis")
-        files = st.file_uploader(
-           "Select multiple images (20+ supported)",
-            type=["jpg", "jpeg", "png"],
-            accept_multiple_files=True,
+    st.markdown("### Batch image analysis")
+    files = st.file_uploader(
+        "Select multiple images (20+ supported)",
+        type=["jpg", "jpeg", "png"],
+        accept_multiple_files=True,
+    )
+    if files:
+        st.write(f"**{len(files)} image(s) selected**")
+        model = load_model()
+        rows = []
+        columns = st.columns(4)
+        for i, file in enumerate(files):
+            try:
+                image = Image.open(file).convert("RGB")
+                label, score, scores = predict_image(image, model)
+                row = {
+                    "filename": file.name,
+                    "prediction": label,
+                    "top_score": round(score, 6),
+                }
+                for name, value in zip(LABELS, scores):
+                    row[f"score_{name}"] = round(float(value), 6)
+                rows.append(row)
+                with columns[i % 4]:
+                    st.image(image, use_container_width=True)
+                    st.caption(file.name)
+                    st.write(f"**{label.title()}**")
+                    st.caption(f"Score: {score * 100:.1f}%")
+            except Exception as error:
+                rows.append({
+                    "filename": file.name,
+                    "prediction": "ERROR",
+                    "error": str(error),
+                })
+        results = pd.DataFrame(rows)
+        st.markdown("### Results")
+        st.dataframe(results, use_container_width=True, hide_index=True)
+        st.download_button(
+            "Download predictions as CSV",
+            data=results.to_csv(index=False).encode("utf-8"),
+            file_name="petvision_batch_predictions.csv",
+            mime="text/csv",
         )
-        if files:
-            st.write(f"**{len(files)} image(s) selected**")
-            model = load_model()
-            rows = []
-            columns = st.columns(4)
-            for i, file in enumerate(files):
-                try:
-                   image = Image.open(file).convert("RGB")
-                   label, score, scores = predict_image(image, model)
-                   row = {
-                      "filename": file.name,
-                      "prediction": label,
-                      "top_score": round(score, 6),
-                  }
-                  for name, value in zip(LABELS, scores):
-                      row[f"score_{name}"] = round(float(value), 6)
-                  rows.append(row)
-                  with columns[i % 4]:
-                      st.image(image, use_container_width=True)
-                      st.caption(file.name)
-                      st.write(f"**{label.title()}**")
-                      st.caption(f"Score: {score * 100:.1f}%")
-     except Exception as error:
-        rows.append({
-          "filename": file.name,
-          "prediction": "ERROR",
-          "error": str(error),
-      })
-  results = pd.DataFrame(rows)
-  st.markdown("### Results")
-  st.dataframe(results, use_container_width=True, hide_index=True)
-  st.download_button(
-      "Download predictions as CSV",
-       data=results.to_csv(index=False).encode("utf-8"),
-       file_name="petvision_batch_predictions.csv",
-       mime="text/csv",
-  )
-  st.caption("Batch predictions are not labelled evaluation results.")
-else:
-  st.info("Select multiple images to create a batch report.")
+        st.caption("Batch predictions are not labelled evaluation results.")
+    else:
+        st.info("Select multiple images to create a batch report.")
 elif page == "Model evaluation":
     st.markdown("### Model evaluation")
     st.write("These files must come from labelled test data and actual predictions.")
     metrics_file = Path("evaluation/evaluation_metrics.json")
     if metrics_file.exists():
-         try:
+        try:
             metrics = json.loads(metrics_file.read_text(encoding="utf-8"))
             columns = st.columns(4)
             metric_keys = ["accuracy", "precision_macro", "recall_macro", "f1_macro"]
@@ -184,7 +185,7 @@ elif page == "Model evaluation":
                 display = f"{float(value):.3f}" if value is not None else "N/A"
                 column.metric(key.replace("_", " ").title(), display)
         except Exception as error:
-             st.error(f"Cannot read evaluation_metrics.json: {error}")
+            st.error(f"Cannot read evaluation_metrics.json: {error}")
     else:
         st.warning("Missing evaluation/evaluation_metrics.json.")
     report = read_csv_if_exists("evaluation/classification_report.csv")
