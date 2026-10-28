@@ -118,7 +118,7 @@ elif page == "Predict image":
                 })
                 st.dataframe(score_table, hide_index=True, use_container_width=True)
                 st.markdown("</div>", unsafe_allow_html=True)
-         except Exception as error:
+        except Exception as error:
                 st.error(f"Could not process this image: {error}")
                 st.warning("Check model file, class order, image size, and preprocessing.")
   else:
